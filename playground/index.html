@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tarte-aux-etrons — playground</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, sans-serif;
+      background: #fafafa;
+      color: #111;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2rem;
+      padding: 2rem;
+    }
+
+    h1 {
+      font-size: 2rem;
+    }
+
+    p {
+      color: #555;
+      max-width: 480px;
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    .controls {
+      display: flex;
+      gap: .75rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    button {
+      padding: .5rem 1.2rem;
+      border-radius: .5rem;
+      border: 1px solid #d1d5db;
+      background: #fff;
+      cursor: pointer;
+      font-size: .875rem;
+      font-weight: 500;
+    }
+
+    button:hover {
+      background: #f3f4f6;
+    }
+
+    pre {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 1rem 1.5rem;
+      border-radius: .75rem;
+      font-size: .8rem;
+      width: min(560px, 100%);
+      overflow: auto;
+    }
+
+    [data-tae-youtube] {
+      width: 480px;
+      max-width: 100%;
+      aspect-ratio: 480/270;
+      background: #111;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      border-radius: .5rem;
+      font-size: .875rem;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>💩 tarte-aux-etrons</h1>
+  <p>
+    Parce que les cookies, c'est de la merde.<br />
+    Une lib RGPD moderne, typée, et qui assume.
+  </p>
+
+  <div class="controls">
+    <button id="btn-reset">Remettre la bannière (flush)</button>
+    <button id="btn-accept">Tout accepter</button>
+    <button id="btn-refuse">Tout refuser</button>
+  </div>
+
+  <div data-tae-youtube="dQw4w9WgXcQ">
+    🎬 Vidéo YouTube (acceptez les cookies pour la voir)
+  </div>
+
+  <pre id="state-output">En attente...</pre>
+
+  <script type="module" src="./main.ts"></script>
+</body>
+
+</html>
