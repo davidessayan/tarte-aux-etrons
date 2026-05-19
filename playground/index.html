@@ -16,90 +16,189 @@
       font-family: system-ui, sans-serif;
       background: #fafafa;
       color: #111;
-      min-height: 100vh;
+      min-height: 100dvh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      padding: 3rem 1.5rem 8rem;
       gap: 2rem;
-      padding: 2rem;
     }
 
-    h1 {
-      font-size: 2rem;
-    }
-
-    p {
-      color: #555;
-      max-width: 480px;
+    header {
       text-align: center;
-      line-height: 1.6;
     }
 
-    .controls {
+    header h1 {
+      font-size: clamp(1.5rem, 5vw, 2.25rem);
+      font-weight: 800;
+      letter-spacing: -.02em;
+    }
+
+    header p {
+      margin-top: .4rem;
+      color: #6b7280;
+      font-size: .925rem;
+    }
+
+    .section {
+      width: 100%;
+      max-width: 640px;
       display: flex;
+      flex-direction: column;
       gap: .75rem;
-      flex-wrap: wrap;
-      justify-content: center;
+    }
+
+    .section-label {
+      font-size: .7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: #9ca3af;
+    }
+
+    /* ── Boutons de contrôle ── */
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: .5rem;
     }
 
     button {
-      padding: .5rem 1.2rem;
+      padding: .55rem .75rem;
       border-radius: .5rem;
-      border: 1px solid #d1d5db;
+      border: 1px solid #e5e7eb;
       background: #fff;
       cursor: pointer;
-      font-size: .875rem;
-      font-weight: 500;
+      font-size: .8rem;
+      font-weight: 600;
+      color: #374151;
+      transition: background .15s, border-color .15s;
+      white-space: nowrap;
     }
 
     button:hover {
       background: #f3f4f6;
+      border-color: #d1d5db;
     }
 
-    pre {
-      background: #1e1e1e;
-      color: #d4d4d4;
-      padding: 1rem 1.5rem;
-      border-radius: .75rem;
-      font-size: .8rem;
-      width: min(560px, 100%);
-      overflow: auto;
+    button.primary {
+      background: #1d4ed8;
+      border-color: #1d4ed8;
+      color: #fff;
     }
 
-    [data-tae-youtube] {
-      width: 480px;
-      max-width: 100%;
-      aspect-ratio: 480/270;
+    button.primary:hover {
+      background: #1e40af;
+      border-color: #1e40af;
+    }
+
+    button.danger {
+      background: #fff;
+      border-color: #fca5a5;
+      color: #dc2626;
+    }
+
+    button.danger:hover {
+      background: #fef2f2;
+    }
+
+    /* ── Vidéo YouTube ── */
+    .video-wrapper {
+      width: 100%;
+      aspect-ratio: 16 / 9;
       background: #111;
+      border-radius: .75rem;
+      overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #fff;
-      border-radius: .5rem;
+      position: relative;
+    }
+
+    .video-wrapper iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+
+    .video-placeholder {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: .5rem;
+      color: #9ca3af;
       font-size: .875rem;
+      pointer-events: none;
+    }
+
+    .video-placeholder span {
+      font-size: 2rem;
+    }
+
+    /* ── État JSON ── */
+    pre {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 1rem 1.25rem;
+      border-radius: .75rem;
+      font-size: .775rem;
+      line-height: 1.6;
+      overflow: auto;
+      width: 100%;
+    }
+
+    /* Cache le placeholder dès que l'iframe a un src actif */
+    .video-wrapper:has(iframe[src]:not([src=""])) .video-placeholder {
+      display: none;
+    }
+
+    /* ── Mobile ── */
+    @media (max-width: 480px) {
+      .controls {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 
 <body>
-  <h1>💩 tarte-aux-etrons</h1>
-  <p>
-    Parce que les cookies, c'est de la merde.<br />
-    Une lib RGPD moderne, typée, et qui assume.
-  </p>
 
-  <div class="controls">
-    <button id="btn-reset">Remettre la bannière (flush)</button>
-    <button id="btn-accept">Tout accepter</button>
-    <button id="btn-refuse">Tout refuser</button>
+  <header>
+    <h1>💩 tarte-aux-etrons</h1>
+    <p>Parce que les cookies, c'est de la merde.</p>
+  </header>
+
+  <div class="section">
+    <span class="section-label">Contrôles</span>
+    <div class="controls">
+      <button class="primary" id="btn-accept">Tout gober</button>
+      <button class="danger" id="btn-refuse">Tirer la chasse</button>
+      <button id="btn-reset">Trier les étrons 🪠</button>
+    </div>
   </div>
 
-  <div data-tae-youtube="dQw4w9WgXcQ">
-    🎬 Vidéo YouTube (acceptez les cookies pour la voir)
+  <div class="section">
+    <span class="section-label">YouTube (data-src)</span>
+    <div class="video-wrapper">
+      <div class="video-placeholder">
+        <span>🎬</span>
+        <p>Acceptez les cookies pour voir la vidéo</p>
+      </div>
+      <iframe
+        data-src="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ"
+        allowfullscreen
+      ></iframe>
+    </div>
   </div>
 
-  <pre id="state-output">En attente...</pre>
+  <div class="section">
+    <span class="section-label">État du consentement</span>
+    <pre id="state-output">En attente...</pre>
+  </div>
 
   <script type="module" src="./main.ts"></script>
 </body>

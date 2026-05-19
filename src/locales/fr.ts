@@ -6,6 +6,7 @@ export const fr: BannerLabels = {
   acceptAll: 'Tout accepter',
   refuseAll: 'Tout refuser',
   customize: 'Personnaliser',
+  customizeClose: 'Fermer',
   save: 'Enregistrer mes choix',
   categoryLabels: {
     analytics: 'Analyse',
@@ -19,9 +20,10 @@ export const fr: BannerLabels = {
 export const frPoop: BannerLabels = {
   title: 'Ce site utilise des cookies',
   description: 'Gare au caca. À vous de voir ce que vous avalez.',
-  acceptAll: 'Tout avaler',
-  refuseAll: 'Tout rejeter',
-  customize: 'Trier sur le volet',
+  acceptAll: 'Tout gober',
+  refuseAll: 'Tirer la chasse',
+  customize: 'Trier les étrons',
+  customizeClose: 'Fermer les étrons',
   save: 'Valider ma sélection',
   categoryLabels: {
     analytics: 'Espionnage poli',
