@@ -1,0 +1,38 @@
+name: Deploy playground
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  playground:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build playground
+        run: npm run build:playground
+
+      - name: Deploy to server
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          REMOTE_USER: creativeqs
+          REMOTE_HOST: ssh.cluster123.hosting.ovh.net
+          REMOTE_PATH: /home/creativeqs/tarteauxetrons
+        run: |
+          install -m 700 -d ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H "$REMOTE_HOST" >> ~/.ssh/known_hosts
+
+          scp -r -i ~/.ssh/deploy_key dist-playground/. \
+            "${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_PATH}/"

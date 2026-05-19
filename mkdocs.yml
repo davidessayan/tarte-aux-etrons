@@ -1,0 +1,54 @@
+site_name: "💩 tarte-aux-etrons"
+site_description: "Lib RGPD cookie consent moderne, typée TypeScript, et qui assume."
+site_author: "David Essayan"
+# site_url est défini dynamiquement par le workflow (version courante)
+# Ex: https://tarteauxetrons.creative-bones.com/docs/0.1.0/
+
+docs_dir: docs
+site_dir: site
+
+theme:
+  name: material
+  language: fr
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: deep orange
+      accent: amber
+      toggle:
+        icon: material/brightness-7
+        name: Passer en mode sombre
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: deep orange
+      accent: amber
+      toggle:
+        icon: material/brightness-4
+        name: Passer en mode clair
+  features:
+    - navigation.top
+    - navigation.instant
+    - search.highlight
+    - search.suggest
+    - content.code.copy
+
+extra:
+  version:
+    provider: mike
+
+plugins:
+  - search:
+      lang: fr
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.superfences
+  - admonition
+  - tables
+  - toc:
+      permalink: true
+
+nav:
+  - Accueil: index.md
