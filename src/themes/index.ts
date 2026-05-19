@@ -17,7 +17,7 @@ export const poopTheme: ThemeVars = {
   radius:        '1.25rem',
 }
 
-export const defaultTheme: ThemeVars = {
+export const seriousTheme: ThemeVars = {
   accent:        '#2563eb',
   accentHover:   '#1d4ed8',
   accentLight:   '#eff6ff',

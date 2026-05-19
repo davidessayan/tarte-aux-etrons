@@ -11,7 +11,9 @@ Une lib RGPD/cookie consent moderne, typée TypeScript, sans dépendances, et qu
 
 ## Pourquoi ?
 
-[tarteaucitron.js](https://tarteaucitron.io/) fonctionne, mais c'est verbeux, daté, pas typé, et franchement pénible à intégrer dans un projet moderne. `tarte-aux-etrons` est une alternative légère, à l'API simple, construite pour les stacks actuelles.
+Parce que les cookies, c'est de la merde. Alors autant en faire un truc agréable.
+
+`tarte-aux-etrons` est une lib légère, typée TypeScript, sans dépendances, avec une API pensée pour ne pas vous pourrir la vie.
 
 ---
 
@@ -147,7 +149,7 @@ createTaE({
   services: [...],
   banner: {
     preset: 'poop',    // 💩 brun ambré — défaut
-    preset: 'default', // bleu sobre
+    preset: 'serious', // bleu sobre
     preset: 'none',    // aucun style — apportez le vôtre
   },
 })
@@ -271,7 +273,7 @@ manager.on('consent:change', ({ serviceId, status, state }) => {
 
 // Changement en masse (boutons "Tout accepter" / "Tout refuser")
 manager.on('consent:bulk', ({ action, state }) => {
-  console.log(action) // 'accept-all' | 'refuse-all'
+  console.log(action) // 'swallow-all' | 'flush-all'
 })
 
 // Prêt (appelé une fois à l'init, avec l'état restauré du storage)
@@ -295,9 +297,9 @@ unsubscribe()
 ## Vérifier le consentement à la demande
 
 ```ts
-manager.isAccepted('ga4')  // boolean
-manager.isRefused('ga4')   // boolean
-manager.isPending('ga4')   // boolean
+manager.isDigested('ga4')  // boolean — consentement donné
+manager.isFlushed('ga4')   // boolean — refusé
+manager.isFloating('ga4')  // boolean — pas encore décidé
 
 manager.getServiceStatus('ga4') // 'accepted' | 'refused' | 'pending'
 manager.getState()              // ConsentState complet
@@ -308,11 +310,11 @@ manager.getState()              // ConsentState complet
 ## Actions programmatiques
 
 ```ts
-manager.acceptAll() // Accepte tous les services
-manager.refuseAll() // Refuse tous les services
-manager.accept('ga4') // Accepte un service précis
-manager.refuse('ga4') // Refuse un service précis
-manager.flush()       // Réinitialise tout + réaffiche la bannière
+manager.swallowAll() // Accepte tous les services
+manager.flushAll()   // Refuse tous les services
+manager.swallow('ga4') // Accepte un service précis
+manager.flush('ga4')   // Refuse un service précis
+manager.plunge()       // Réinitialise tout + réaffiche la bannière 🪠
 ```
 
 ---
@@ -329,7 +331,7 @@ const manager = new ConsentManager({
   consentVersion: 1,
   onReady(state) { /* état restauré */ },
   onConsentChange(serviceId, status) { /* changement individuel */ },
-  onBulkChange(action, state) { /* acceptAll / refuseAll */ },
+  onBulkChange(action, state) { /* swallowAll / flushAll */ },
 })
 
 manager.init() // À appeler après avoir monté votre UI
@@ -349,12 +351,12 @@ createTaE({
   consentVersion?: number,   // incrémenter pour forcer un re-consentement
   onReady?: (state) => void,
   onConsentChange?: (serviceId, status) => void,
-  onBulkChange?: (action, state) => void,
+  onBulkChange?: (action, state) => void, // action: 'swallow-all' | 'flush-all'
 
   // Optionnel — Bannière
   banner?: {
-    target?: HTMLElement,       // où monter la bannière, défaut: document.body
-    preset?: 'poop' | 'default' | 'none',
+    target?: HTMLElement,              // où monter la bannière, défaut: document.body
+    preset?: 'poop' | 'serious' | 'none',
     vars?: ThemeVars,
     labels?: Partial<BannerLabels>,
   },

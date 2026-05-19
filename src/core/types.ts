@@ -34,7 +34,7 @@ export interface TaEConfig {
   consentVersion?: number
   onReady?: (state: ConsentState) => void
   onConsentChange?: (serviceId: string, status: ConsentStatus) => void
-  onBulkChange?: (action: 'accept-all' | 'refuse-all', state: ConsentState) => void
+  onBulkChange?: (action: 'swallow-all' | 'flush-all', state: ConsentState) => void
 }
 
 export interface BannerLabels {
@@ -67,7 +67,7 @@ export interface ThemeVars {
 export type ConsentEventMap = {
   ready: ConsentState
   'consent:change': { serviceId: string; status: ConsentStatus; state: ConsentState }
-  'consent:bulk': { action: 'accept-all' | 'refuse-all'; state: ConsentState }
+  'consent:bulk': { action: 'swallow-all' | 'flush-all'; state: ConsentState }
   'banner:show': void
   'banner:hide': void
 }
