@@ -87,13 +87,17 @@ import { youtube } from 'tarte-aux-etrons'
 youtube()
 ```
 
-Placez un `[data-tae-youtube]` dans votre HTML — la lib le remplace par une iframe une fois le consentement donné :
+Utilisez `data-src` au lieu de `src` sur vos iframes YouTube — la lib active le chargement une fois le consentement donné :
 
 ```html
-<div data-tae-youtube="dQw4w9WgXcQ" data-width="560" data-height="315">
-  Acceptez les cookies pour voir la vidéo.
-</div>
+<iframe
+  data-src="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ"
+  width="560" height="315"
+  allowfullscreen
+></iframe>
 ```
+
+Fonctionne aussi avec `youtube.com` dans l'URL. Sur refus, le `src` est vidé pour stopper le chargement.
 
 ### Hotjar
 
