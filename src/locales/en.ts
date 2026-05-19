@@ -18,7 +18,7 @@ export const en: BannerLabels = {
 }
 
 export const enPoop: BannerLabels = {
-  title: 'This site uses cookies',
+  title: 'This site uses poops',
   description: 'Watch out for the poop. Your call on what you swallow.',
   acceptAll: 'Swallow all',
   refuseAll: 'Flush all',

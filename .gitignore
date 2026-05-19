@@ -5,3 +5,4 @@ site/
 .DS_Store
 *.local
 CLAUDE.md
+.claude
