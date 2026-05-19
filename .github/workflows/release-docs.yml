@@ -1,0 +1,98 @@
+name: Publish documentation
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install MkDocs Material
+        run: pip install mkdocs-material
+
+      - name: Generate docs/index.md from README
+        run: cp README.md docs/index.md
+
+      - name: Set versioned site URL
+        run: |
+          python3 - "${{ steps.version.outputs.VERSION }}" << 'PYEOF'
+          import sys, yaml
+
+          version = sys.argv[1]
+          with open("mkdocs.yml") as f:
+              config = yaml.safe_load(f)
+          config["site_url"] = f"https://tarteauxetrons.creative-bones.com/docs/{version}/"
+          with open("mkdocs.yml", "w") as f:
+              yaml.dump(config, f, allow_unicode=True, default_flow_style=False, sort_keys=False)
+          PYEOF
+
+      - name: Build docs
+        run: mkdocs build
+
+      - name: Deploy to server
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          REMOTE_USER: creativeqs
+          REMOTE_HOST: ssh.cluster123.hosting.ovh.net
+          REMOTE_DOCS: /home/creativeqs/tarteauxetrons/docs
+          VERSION: ${{ steps.version.outputs.VERSION }}
+        run: |
+          install -m 700 -d ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H "$REMOTE_HOST" >> ~/.ssh/known_hosts
+
+          ssh -i ~/.ssh/deploy_key "${REMOTE_USER}@${REMOTE_HOST}" \
+            "mkdir -p ${REMOTE_DOCS}/${VERSION}"
+
+          scp -r -i ~/.ssh/deploy_key site/. \
+            "${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_DOCS}/${VERSION}/"
+
+          cat > /tmp/update_versions.py << 'PYEOF'
+          import sys, json, os
+
+          version = sys.argv[1]
+          docs_dir = sys.argv[2]
+          json_path = os.path.join(docs_dir, "versions.json")
+
+          versions = []
+          if os.path.exists(json_path):
+              with open(json_path) as f:
+                  versions = json.load(f)
+
+          for v in versions:
+              v["aliases"] = [a for a in v.get("aliases", []) if a != "latest"]
+
+          versions = [v for v in versions if v["version"] != version]
+          versions.insert(0, {"version": version, "title": version, "aliases": ["latest"]})
+
+          with open(json_path, "w") as f:
+              json.dump(versions, f, indent=2)
+              f.write("\n")
+
+          print(f"versions.json mis à jour — {version} est maintenant latest")
+          PYEOF
+
+          scp -i ~/.ssh/deploy_key /tmp/update_versions.py \
+            "${REMOTE_USER}@${REMOTE_HOST}:/tmp/update_versions_${VERSION}.py"
+
+          ssh -i ~/.ssh/deploy_key "${REMOTE_USER}@${REMOTE_HOST}" \
+            "python3 /tmp/update_versions_${VERSION}.py '${VERSION}' '${REMOTE_DOCS}' \
+             && rm -f /tmp/update_versions_${VERSION}.py \
+             && rm -rf '${REMOTE_DOCS}/latest' \
+             && cp -r '${REMOTE_DOCS}/${VERSION}' '${REMOTE_DOCS}/latest' \
+             && echo 'latest/ → ${VERSION}'"

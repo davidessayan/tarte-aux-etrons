@@ -19,7 +19,8 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "playground": "vite playground",
+    "playground": "vite",
+    "build:playground": "vite build",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src --ext .ts"
   },

@@ -1,5 +1,7 @@
 node_modules/
 dist/
+dist-playground/
+site/
 .DS_Store
 *.local
 CLAUDE.md
