@@ -43,6 +43,7 @@ export interface BannerLabels {
   acceptAll: string
   refuseAll: string
   customize: string
+  customizeClose: string
   save: string
   categoryLabels: Record<ServiceCategory, string>
 }

@@ -6,6 +6,7 @@ export const en: BannerLabels = {
   acceptAll: 'Accept all',
   refuseAll: 'Refuse all',
   customize: 'Customize',
+  customizeClose: 'Close',
   save: 'Save my choices',
   categoryLabels: {
     analytics: 'Analytics',
@@ -22,6 +23,7 @@ export const enPoop: BannerLabels = {
   acceptAll: 'Swallow all',
   refuseAll: 'Flush all',
   customize: 'Pick your poop',
+  customizeClose: 'Close the lid',
   save: 'Save my choices',
   categoryLabels: {
     analytics: 'Polite spying',

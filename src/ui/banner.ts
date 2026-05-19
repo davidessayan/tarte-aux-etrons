@@ -46,6 +46,7 @@ export class Banner {
   private vars: ThemeVars
   private el: HTMLElement | null = null
   private panel: HTMLElement | null = null
+  private customizeBtn: HTMLElement | null = null
   private unsubscribers: Array<() => void> = []
 
   constructor(options: BannerOptions) {
@@ -116,7 +117,8 @@ export class Banner {
 
     root.querySelector('.tae-btn-accept')?.addEventListener('click', () => this.manager.swallowAll())
     root.querySelector('.tae-btn-refuse')?.addEventListener('click', () => this.manager.flushAll())
-    root.querySelector('.tae-btn-customize')?.addEventListener('click', () => this.togglePanel())
+    this.customizeBtn = root.querySelector('.tae-btn-customize')
+    this.customizeBtn?.addEventListener('click', () => this.togglePanel())
 
     this.panel = root.querySelector('.tae-panel')
     this.panel?.querySelector('.tae-btn-save')?.addEventListener('click', () => this.saveFromPanel())
@@ -182,7 +184,12 @@ export class Banner {
   }
 
   private togglePanel(): void {
-    this.panel?.classList.toggle('tae-panel--open')
+    const isOpen = this.panel?.classList.toggle('tae-panel--open') ?? false
+    if (this.customizeBtn) {
+      this.customizeBtn.textContent = isOpen
+        ? this.labels.customizeClose
+        : this.labels.customize
+    }
   }
 
   private saveFromPanel(): void {
