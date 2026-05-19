@@ -16,8 +16,8 @@
   --tae-radius: 1.25rem;
 }
 
-/* ─── Thème "default" (bleu sobre) ────────────────────────────────────────── */
-.tae-banner[data-theme="default"] {
+/* ─── Thème "serious" (bleu sobre) ────────────────────────────────────────── */
+.tae-banner[data-theme="serious"] {
   --tae-accent: #2563eb;
   --tae-accent-hover: #1d4ed8;
   --tae-accent-light: #eff6ff;

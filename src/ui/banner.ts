@@ -8,7 +8,7 @@ export type { BannerLabels, ThemeVars }
 export interface BannerOptions {
   manager: ConsentManager
   target?: HTMLElement
-  preset?: 'poop' | 'default' | 'none'
+  preset?: 'poop' | 'serious' | 'none'
   vars?: ThemeVars
   labels?: Partial<BannerLabels>
 }
@@ -54,7 +54,7 @@ export class Banner {
     this.preset = options.preset ?? 'poop'
     this.vars = options.vars ?? {}
 
-    const baseLabels = this.preset === 'default' ? fr : frPoop
+    const baseLabels = this.preset === 'serious' ? fr : frPoop
     this.labels = { ...baseLabels, ...options.labels }
   }
 
@@ -108,14 +108,14 @@ export class Banner {
     root.setAttribute('aria-modal', 'false')
     root.setAttribute('aria-label', this.labels.title)
 
-    if (this.preset === 'default') {
-      root.dataset.theme = 'default'
+    if (this.preset === 'serious') {
+      root.dataset.theme = 'serious'
     }
 
     root.innerHTML = this.renderHTML()
 
-    root.querySelector('.tae-btn-accept')?.addEventListener('click', () => this.manager.acceptAll())
-    root.querySelector('.tae-btn-refuse')?.addEventListener('click', () => this.manager.refuseAll())
+    root.querySelector('.tae-btn-accept')?.addEventListener('click', () => this.manager.swallowAll())
+    root.querySelector('.tae-btn-refuse')?.addEventListener('click', () => this.manager.flushAll())
     root.querySelector('.tae-btn-customize')?.addEventListener('click', () => this.togglePanel())
 
     this.panel = root.querySelector('.tae-panel')
@@ -129,7 +129,7 @@ export class Banner {
     const services = this.manager.getServices()
 
     const serviceRows = services.map((s) => {
-      const accepted = this.manager.isAccepted(s.id)
+      const accepted = this.manager.isDigested(s.id)
       const categoryLabel = this.labels.categoryLabels[s.category]
 
       return `
@@ -191,7 +191,7 @@ export class Banner {
     this.panel.querySelectorAll<HTMLInputElement>('.tae-toggle').forEach((input) => {
       const { serviceId } = input.dataset
       if (!serviceId) return
-      input.checked ? this.manager.accept(serviceId) : this.manager.refuse(serviceId)
+      input.checked ? this.manager.swallow(serviceId) : this.manager.flush(serviceId)
     })
 
     this.hide()

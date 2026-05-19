@@ -26,9 +26,9 @@ manager.on('consent:bulk', ({ action }) => {
   updateStateDisplay()
 })
 
-document.getElementById('btn-reset')?.addEventListener('click', () => manager.flush())
-document.getElementById('btn-accept')?.addEventListener('click', () => manager.acceptAll())
-document.getElementById('btn-refuse')?.addEventListener('click', () => manager.refuseAll())
+document.getElementById('btn-reset')?.addEventListener('click', () => manager.plunge())
+document.getElementById('btn-accept')?.addEventListener('click', () => manager.swallowAll())
+document.getElementById('btn-refuse')?.addEventListener('click', () => manager.flushAll())
 
 function updateStateDisplay() {
   const pre = document.getElementById('state-output')

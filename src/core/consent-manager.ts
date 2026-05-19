@@ -63,15 +63,15 @@ export class ConsentManager {
     return this.state.services[serviceId]?.status ?? 'pending'
   }
 
-  isAccepted(serviceId: string): boolean {
+  isDigested(serviceId: string): boolean {
     return this.getServiceStatus(serviceId) === 'accepted'
   }
 
-  isRefused(serviceId: string): boolean {
+  isFlushed(serviceId: string): boolean {
     return this.getServiceStatus(serviceId) === 'refused'
   }
 
-  isPending(serviceId: string): boolean {
+  isFloating(serviceId: string): boolean {
     return this.getServiceStatus(serviceId) === 'pending'
   }
 
@@ -80,39 +80,39 @@ export class ConsentManager {
   }
 
   needsBanner(): boolean {
-    return this.config.services.some((s) => this.isPending(s.id))
+    return this.config.services.some((s) => this.isFloating(s.id))
   }
 
-  acceptAll(): void {
+  swallowAll(): void {
     this.config.services.forEach((s) => this.applyConsent(s.id, 'accepted'))
     this.persist()
     this.config.services.forEach((s) => this.config.onConsentChange(s.id, 'accepted'))
-    this.config.onBulkChange('accept-all', this.state)
-    this.events.emit('consent:bulk', { action: 'accept-all', state: this.state })
+    this.config.onBulkChange('swallow-all', this.state)
+    this.events.emit('consent:bulk', { action: 'swallow-all', state: this.state })
     this.events.emit('banner:hide')
   }
 
-  refuseAll(): void {
+  flushAll(): void {
     this.config.services.forEach((s) => this.applyConsent(s.id, 'refused'))
     this.persist()
     this.config.services.forEach((s) => this.config.onConsentChange(s.id, 'refused'))
-    this.config.onBulkChange('refuse-all', this.state)
-    this.events.emit('consent:bulk', { action: 'refuse-all', state: this.state })
+    this.config.onBulkChange('flush-all', this.state)
+    this.events.emit('consent:bulk', { action: 'flush-all', state: this.state })
     this.events.emit('banner:hide')
   }
 
-  accept(serviceId: string): void {
+  swallow(serviceId: string): void {
     this.setConsent(serviceId, 'accepted')
   }
 
-  refuse(serviceId: string): void {
+  flush(serviceId: string): void {
     this.setConsent(serviceId, 'refused')
   }
 
-  flush(): void {
+  plunge(): void {
     // Stoppe les services déjà actifs avant de vider l'état
     this.config.services.forEach((s) => {
-      if (this.isAccepted(s.id)) s.onRefuse()
+      if (this.isDigested(s.id)) s.onRefuse()
     })
 
     this.storage.clear()

@@ -4,7 +4,7 @@ export { Banner } from './ui/banner'
 export { ga4, gtm, youtube, hotjar } from './services'
 export { defineService, loadScript, deleteCookies } from './services/utils'
 export { fr, frPoop, en, enPoop } from './locales'
-export { poopTheme, defaultTheme } from './themes'
+export { poopTheme, seriousTheme } from './themes'
 export type { CreateTaEOptions } from './factory'
 export type {
   TaEConfig,
