@@ -18,7 +18,7 @@ export const fr: BannerLabels = {
 }
 
 export const frPoop: BannerLabels = {
-  title: 'Ce site utilise des cookies',
+  title: 'Ce site utilise des étrons',
   description: 'Gare au caca. À vous de voir ce que vous avalez.',
   acceptAll: 'Tout gober',
   refuseAll: 'Tirer la chasse',
