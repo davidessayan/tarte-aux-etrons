@@ -1,9 +1,9 @@
 name: Deploy playground
 
 on:
-  push:
-    branches:
-      - main
+  release:
+    types:
+      - published
 
 jobs:
   playground:
