@@ -1,0 +1,40 @@
+{
+  "name": "tarte-aux-etrons",
+  "version": "0.1.0",
+  "description": "Parce que les cookies, c'est de la merde. Une lib RGPD moderne, typée, et qui assume.",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "playground": "vite playground",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext .ts"
+  },
+  "keywords": [
+    "rgpd",
+    "gdpr",
+    "cookies",
+    "consent",
+    "banner"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vite": "^5.4.21"
+  }
+}
