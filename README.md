@@ -378,6 +378,13 @@ createTaE({
 
 ---
 
+## Shitmap
+
+- Ajout de `isPerfect()` à l'API quand tous les services ont été acceptés (ou refusés)
+- Ajout progressif de services d'étrons complémentaires (Facebook Pixel, Google Fonts, Google Maps, ReCAPTCHA, TrustPilot, SendInBlue, etc.)
+
+---
+
 ## Licence
 
 MIT
