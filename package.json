@@ -31,8 +31,20 @@
     "consent",
     "banner"
   ],
-  "author": "",
+  "author": {
+    "name": "David Essayan",
+    "email": "da.essayan@gmail.com",
+    "url": "https://github.com/davidessayan"
+  },
   "license": "MIT",
+  "homepage": "https://tarteauxetrons.creative-bones.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/davidessayan/tarte-aux-etrons.git"
+  },
+  "bugs": {
+    "url": "https://github.com/davidessayan/tarte-aux-etrons/issues"
+  },
   "devDependencies": {
     "tsup": "^8.5.1",
     "typescript": "^5.9.3",
