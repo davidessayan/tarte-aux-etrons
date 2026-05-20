@@ -1,4 +1,4 @@
-import { createTaE, ga4, gtm, youtube, frPoop } from '../src/index'
+import { createTaE, ga4, gtm, youtube, chickenplayer, frPoop } from '../src/index'
 
 const { manager } = createTaE({
   consentVersion: 1,
@@ -6,6 +6,7 @@ const { manager } = createTaE({
     ga4('G-XXXXXXXXXX'),
     gtm('GTM-XXXXXXX'),
     youtube(),
+    chickenplayer(),
   ],
   onConsentChange(serviceId, status) {
     console.log(`[tae] ${serviceId} → ${status}`)

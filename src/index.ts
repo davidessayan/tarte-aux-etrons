@@ -1,7 +1,7 @@
 export { createTaE } from './factory'
 export { ConsentManager } from './core/consent-manager'
 export { Banner } from './ui/banner'
-export { ga4, gtm, youtube, hotjar } from './services'
+export { ga4, gtm, youtube, hotjar, chickenplayer } from './services'
 export { defineService, loadScript, deleteCookies } from './services/utils'
 export { fr, frPoop, en, enPoop } from './locales'
 export { poopTheme, seriousTheme } from './themes'

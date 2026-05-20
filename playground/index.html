@@ -5,6 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>tarte-aux-etrons — playground</title>
+  <link rel="stylesheet" href="https://unpkg.com/chicken-player@1.5.0/dist/chicken-player.css">
   <style>
     * {
       box-sizing: border-box;
@@ -38,6 +39,15 @@
       margin-top: .4rem;
       color: #6b7280;
       font-size: .925rem;
+    }
+
+    header a {
+      color: #6b7280;
+      text-decoration: none;
+    }
+
+    header a:hover {
+      color: #111;
     }
 
     .section {
@@ -169,7 +179,7 @@
 
   <header>
     <h1>💩 tarte-aux-etrons</h1>
-    <p>Parce que les cookies, c'est de la merde.</p>
+    <p>Parce que les cookies, c'est de la merde. · <a href="https://tarteauxetrons.creative-bones.com/docs" target="_blank" rel="noopener">Documentation</a> · <a href="https://github.com/davidessayan/tarte-aux-etrons" target="_blank" rel="noopener">GitHub</a></p>
   </header>
 
   <div class="section">
@@ -196,10 +206,19 @@
   </div>
 
   <div class="section">
+    <span class="section-label">Chicken Player</span>
+    <div class="chicken-player" data-type="youtube" data-id="dQw4w9WgXcQ"></div>
+  </div>
+
+  <div class="section">
     <span class="section-label">État du consentement</span>
     <pre id="state-output">En attente...</pre>
   </div>
 
+  <script src="https://unpkg.com/chicken-player@1.5.0/dist/chicken-player.umd.js"></script>
+  <script>
+    new window.ChickenPlayer({ cookies: { active: true } })
+  </script>
   <script type="module" src="./main.ts"></script>
 </body>
 

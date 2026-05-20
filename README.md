@@ -110,6 +110,31 @@ hotjar(1234567)
 hotjar(1234567, { version: 6, id: 'hotjar-custom' })
 ```
 
+### Chicken Player
+
+Intégration native avec [chicken-player](https://www.npmjs.com/package/chicken-player). Gère le consentement pour YouTube, Vimeo et Dailymotion embarqués via le player.
+
+```ts
+import { chickenplayer } from 'tarte-aux-etrons'
+
+chickenplayer()
+```
+
+Côté player, activez la gestion du consentement et listez les plateformes concernées :
+
+```ts
+import ChickenPlayer from 'chicken-player'
+
+new ChickenPlayer({
+  cookies: {
+    active: true,
+    types: ['youtube', 'vimeo', 'dailymotion'],
+  },
+})
+```
+
+Sur acceptation, tarte-aux-etrons dispatche `chickenPlayer.cookies.consent` — le player déverrouille automatiquement les vidéos. Sur refus, `chickenPlayer.cookies.reject` — le player réaffiche le message de consentement.
+
 ---
 
 ## Créer un service personnalisé
