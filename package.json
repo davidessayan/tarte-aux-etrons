@@ -1,6 +1,6 @@
 {
   "name": "tarte-aux-etrons",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Parce que les cookies, c'est de la merde. Une lib RGPD moderne, typée, et qui assume.",
   "type": "module",
   "main": "./dist/index.cjs",
