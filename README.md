@@ -5,7 +5,7 @@
 Une lib RGPD/cookie consent moderne, typée TypeScript, sans dépendances, et qui assume totalement son thème.
 
 [![npm](https://img.shields.io/npm/v/tarte-aux-etrons)](https://www.npmjs.com/package/tarte-aux-etrons)
-[![license](https://img.shields.io/npm/l/tarte-aux-etrons)](./LICENSE)
+[![license](https://img.shields.io/npm/l/tarte-aux-etrons)](https://github.com/davidessayan/tarte-aux-etrons/blob/main/LICENSE)
 
 [📖 Documentation](https://tarteauxetrons.creative-bones.com/docs) · [🛝 Playground](https://tarteauxetrons.creative-bones.com)
 
