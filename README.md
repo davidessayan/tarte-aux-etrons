@@ -157,6 +157,39 @@ matomo('https://analytics.monsite.fr', 1, 'matomo-custom') // id custom
 
 Le trailing slash dans l'URL est normalisé automatiquement.
 
+### Google reCAPTCHA v3
+
+```ts
+import { recaptchaV3 } from 'tarte-aux-etrons'
+
+recaptchaV3('6LeXXXXXXXXXXXXXXXXXXXXXXXX')
+recaptchaV3('6LeXXXXXXXXXXXXXXXXXXXXXXXX', 'recaptcha-contact') // id custom
+```
+
+Le script n'est chargé qu'après consentement. Une fois chargé, `grecaptcha.execute()` reste disponible pour vos formulaires. Sur refus, le cookie `_GRECAPTCHA` est supprimé — le script déjà chargé ne peut pas être déchargé, mais il ne se rechargera pas lors des visites suivantes.
+
+### Microsoft Clarity
+
+```ts
+import { microsoftClarity } from 'tarte-aux-etrons'
+
+microsoftClarity('abcdefghij')
+microsoftClarity('abcdefghij', 'clarity-custom') // id custom
+```
+
+Clarity dispose d'une Consent API native : `clarity('consent')` est appelé automatiquement sur acceptation. Sur refus, les cookies sont supprimés et Clarity bascule en mode cookieless.
+
+### Crisp
+
+```ts
+import { crisp } from 'tarte-aux-etrons'
+
+crisp('xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx')
+crisp('xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx', 'crisp-support') // id custom
+```
+
+Sur refus, la session est réinitialisée et le chatbox masqué. Crisp utilise principalement le localStorage — aucun cookie first-party propre n'est déposé.
+
 ### Chicken Player
 
 Intégration native avec [chicken-player](https://www.npmjs.com/package/chicken-player). Gère le consentement pour YouTube, Vimeo et Dailymotion embarqués via le player.
@@ -459,7 +492,7 @@ createTaE({
 ## Shitmap
 
 - Ajout de `isPerfect()` à l'API quand tous les services ont été acceptés (ou refusés)
-- Ajout progressif de services d'étrons complémentaires (Google Fonts, reCAPTCHA, Microsoft Clarity, Crisp/Intercom, Cloudflare Turnstile, TrustPilot, Brevo...)
+- Ajout progressif de services d'étrons complémentaires (Google Fonts, Cloudflare Turnstile, TrustPilot, Brevo, Intercom...)
 
 ---
 
