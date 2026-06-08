@@ -1,4 +1,4 @@
-import { defineService, loadScript, deleteCookies } from './utils'
+import { defineService, loadScript, deleteCookiesMatching } from './utils'
 
 export function hotjar(siteId: number, { version = 6, id = 'hotjar' } = {}) {
   return defineService({
@@ -18,7 +18,7 @@ export function hotjar(siteId: number, { version = 6, id = 'hotjar' } = {}) {
       loadScript(`https://static.hotjar.com/c/hotjar-${siteId}.js?sv=${version}`)
     },
     onRefuse() {
-      deleteCookies(['_hjid'])
+      deleteCookiesMatching(['_hjSessionUser_', '_hjSession_', '_hjid'])
     },
   })
 }
