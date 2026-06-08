@@ -110,6 +110,53 @@ hotjar(1234567)
 hotjar(1234567, { version: 6, id: 'hotjar-custom' })
 ```
 
+### Facebook Pixel
+
+```ts
+import { facebookPixel } from 'tarte-aux-etrons'
+
+facebookPixel('1234567890123456')
+facebookPixel('1234567890123456', 'fb-pixel') // id custom
+```
+
+### LinkedIn Insight Tag
+
+```ts
+import { linkedinInsight } from 'tarte-aux-etrons'
+
+linkedinInsight('1234567')
+linkedinInsight('1234567', 'linkedin') // id custom
+```
+
+### Google Maps
+
+```ts
+import { googleMaps } from 'tarte-aux-etrons'
+
+googleMaps()
+```
+
+Utilisez `data-src` au lieu de `src` sur vos iframes Google Maps :
+
+```html
+<iframe
+  data-src="https://www.google.com/maps/embed?pb=..."
+  width="600" height="450"
+  allowfullscreen loading="lazy"
+></iframe>
+```
+
+### Matomo
+
+```ts
+import { matomo } from 'tarte-aux-etrons'
+
+matomo('https://analytics.monsite.fr', 1)
+matomo('https://analytics.monsite.fr', 1, 'matomo-custom') // id custom
+```
+
+Le trailing slash dans l'URL est normalisé automatiquement.
+
 ### Chicken Player
 
 Intégration native avec [chicken-player](https://www.npmjs.com/package/chicken-player). Gère le consentement pour YouTube, Vimeo et Dailymotion embarqués via le player.
@@ -160,13 +207,17 @@ const myPixel = defineService({
 **Utilitaires disponibles** pour écrire vos services :
 
 ```ts
-import { loadScript, deleteCookies } from 'tarte-aux-etrons'
+import { loadScript, deleteCookies, deleteCookiesMatching } from 'tarte-aux-etrons'
 
 // Charge un script (idempotent — pas de double chargement)
 loadScript('https://example.com/tracker.js')
 
-// Supprime des cookies côté client (racine + sous-domaine)
+// Supprime des cookies par nom exact (racine + sous-domaine)
 deleteCookies(['_tracker', '_tracker_session'])
+
+// Supprime tous les cookies dont le nom commence par l'un des préfixes
+// Utile pour les cookies à suffixe dynamique (_pk_id.1.xxxx, _hjSession_abc...)
+deleteCookiesMatching(['_tracker_', '_tracker_sess'])
 ```
 
 ---
@@ -408,7 +459,7 @@ createTaE({
 ## Shitmap
 
 - Ajout de `isPerfect()` à l'API quand tous les services ont été acceptés (ou refusés)
-- Ajout progressif de services d'étrons complémentaires (Facebook Pixel, Google Fonts, Google Maps, ReCAPTCHA, TrustPilot, SendInBlue, etc.)
+- Ajout progressif de services d'étrons complémentaires (Google Fonts, reCAPTCHA, Microsoft Clarity, Crisp/Intercom, Cloudflare Turnstile, TrustPilot, Brevo...)
 
 ---
 
