@@ -7,22 +7,33 @@ import type {
 } from './types'
 import { ConsentStorage } from './storage'
 import { EventBus, type Listener } from './events'
+import { CONSENT_SIGNALS, consentDefault, consentUpdate } from './consent-mode'
+
+const DAY_MS = 24 * 60 * 60 * 1000
 
 export class ConsentManager {
   private config: Required<TaEConfig>
   private state: ConsentState
   private storage: ConsentStorage
+  private activated = new Set<string>()
+  private expired: string[] = []
+  private reloadTimer: ReturnType<typeof setTimeout> | null = null
+  private usesConsentMode: boolean
+  private signalsSent = ''
   readonly events: EventBus
 
   constructor(config: TaEConfig) {
     this.config = {
       storageKey: 'tae_consent',
       consentVersion: 1,
+      consentMaxAge: 180,
+      reloadOnRevoke: true,
       onReady: () => {},
       onConsentChange: () => {},
       onBulkChange: () => {},
       ...config,
     }
+    this.usesConsentMode = this.config.services.some((s) => s.consentSignals?.length)
     this.storage = new ConsentStorage(this.config.storageKey)
     this.events = new EventBus()
     this.state = this.initState()
@@ -32,7 +43,7 @@ export class ConsentManager {
     const saved = this.storage.load()
 
     if (saved && saved.version === this.config.consentVersion) {
-      return saved
+      return this.dropExpired(saved)
     }
 
     return {
@@ -42,13 +53,38 @@ export class ConsentManager {
     }
   }
 
+  // Les choix plus vieux que `consentMaxAge` repassent en `pending` (re-demande du consentement)
+  private dropExpired(saved: ConsentState): ConsentState {
+    const maxAge = this.config.consentMaxAge * DAY_MS
+    if (maxAge <= 0) return saved
+
+    const now = Date.now()
+    const services: ConsentState['services'] = {}
+    for (const [id, consent] of Object.entries(saved.services)) {
+      if (now - consent.updatedAt > maxAge) this.expired.push(id)
+      else services[id] = consent
+    }
+    return { ...saved, services }
+  }
+
   init(): void {
     if (typeof window === 'undefined') return
 
+    // Consent Mode : « denied » partout puis l'état restauré, avant que le moindre tag ne démarre
+    if (this.usesConsentMode) {
+      consentDefault()
+      this.syncConsentMode()
+    }
+
     this.config.services.forEach((service) => {
       const status = this.getServiceStatus(service.id)
-      if (status === 'accepted') service.onAccept()
+      if (status === 'accepted') this.activate(service)
       if (status === 'refused') service.onRefuse()
+    })
+
+    // Nettoie les traces des choix expirés : le service est de nouveau en attente de décision
+    this.expired.forEach((id) => {
+      this.config.services.find((s) => s.id === id)?.onRefuse()
     })
 
     this.config.onReady(this.state)
@@ -84,7 +120,7 @@ export class ConsentManager {
   }
 
   swallowAll(): void {
-    this.config.services.forEach((s) => this.applyConsent(s.id, 'accepted'))
+    this.applyAll('accepted')
     this.persist()
     this.config.services.forEach((s) => this.config.onConsentChange(s.id, 'accepted'))
     this.config.onBulkChange('swallow-all', this.state)
@@ -93,7 +129,7 @@ export class ConsentManager {
   }
 
   flushAll(): void {
-    this.config.services.forEach((s) => this.applyConsent(s.id, 'refused'))
+    this.applyAll('refused')
     this.persist()
     this.config.services.forEach((s) => this.config.onConsentChange(s.id, 'refused'))
     this.config.onBulkChange('flush-all', this.state)
@@ -112,7 +148,7 @@ export class ConsentManager {
   plunge(): void {
     // Stoppe les services déjà actifs avant de vider l'état
     this.config.services.forEach((s) => {
-      if (this.isDigested(s.id)) s.onRefuse()
+      if (this.isDigested(s.id)) this.deactivate(s)
     })
 
     this.storage.clear()
@@ -121,6 +157,7 @@ export class ConsentManager {
       updatedAt: Date.now(),
       services: {},
     }
+    this.syncConsentMode()
     this.events.emit('banner:show')
   }
 
@@ -140,11 +177,58 @@ export class ConsentManager {
     const service = this.config.services.find((s) => s.id === serviceId)
     if (!service) return
 
+    this.record(serviceId, status)
+    this.syncConsentMode()
+    this.dispatch(service, status)
+  }
+
+  // En rafale, les signaux sont envoyés une seule fois, avant le démarrage du premier service
+  private applyAll(status: ConsentStatus): void {
+    this.config.services.forEach((s) => this.record(s.id, status))
+    this.syncConsentMode()
+    this.config.services.forEach((s) => this.dispatch(s, status))
+  }
+
+  private record(serviceId: string, status: ConsentStatus): void {
     this.state.services[serviceId] = { status, updatedAt: Date.now() }
     this.state.updatedAt = Date.now()
+  }
 
-    if (status === 'accepted') service.onAccept()
-    if (status === 'refused') service.onRefuse()
+  private dispatch(service: ServiceDefinition, status: ConsentStatus): void {
+    if (status === 'accepted') this.activate(service)
+    if (status === 'refused') this.deactivate(service)
+  }
+
+  // Signaux accordés = union de ceux des services acceptés. N'envoie que si ça a changé.
+  private syncConsentMode(): void {
+    if (!this.usesConsentMode) return
+
+    const granted = CONSENT_SIGNALS.filter((signal) =>
+      this.config.services.some((s) => this.isDigested(s.id) && s.consentSignals?.includes(signal)),
+    )
+    const key = granted.join()
+    if (key === this.signalsSent) return
+
+    this.signalsSent = key
+    consentUpdate(granted)
+  }
+
+  private activate(service: ServiceDefinition): void {
+    service.onAccept()
+    this.activated.add(service.id)
+  }
+
+  // Un service déjà actif dans cette page ne peut pas toujours être déchargé : on recharge
+  private deactivate(service: ServiceDefinition): void {
+    service.onRefuse()
+    const wasActive = this.activated.delete(service.id)
+    if (wasActive && service.requiresReload) this.scheduleReload()
+  }
+
+  // Différé : laisse finir les retraits en rafale (panneau) et leur persistance avant de recharger
+  private scheduleReload(): void {
+    if (!this.config.reloadOnRevoke || typeof window === 'undefined' || this.reloadTimer) return
+    this.reloadTimer = setTimeout(() => window.location.reload(), 0)
   }
 
   private setConsent(serviceId: string, status: ConsentStatus): void {

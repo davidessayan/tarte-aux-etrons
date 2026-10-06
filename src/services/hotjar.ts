@@ -1,12 +1,21 @@
-import { defineService, loadScript, deleteCookiesMatching } from './utils'
+import { defineService, loadScript, deleteCookiesMatching, clearStorageMatching } from './utils'
 
-export function hotjar(siteId: number, { version = 6, id = 'hotjar' } = {}) {
+export interface HotjarOptions {
+  version?: number
+  /** Id du service (défaut : 'hotjar'). */
+  id?: string
+}
+
+export function hotjar(siteId: number, options: string | HotjarOptions = {}) {
+  const { version = 6, id = 'hotjar' } = typeof options === 'string' ? { id: options } : options
+
   return defineService({
     id,
     name: 'Hotjar',
     category: 'analytics',
     description: 'Enregistrement de sessions et heatmaps.',
-    cookieNames: ['_hjSessionUser_*', '_hjSession_*', '_hjid'],
+    cookieNames: ['_hjSessionUser_*', '_hjSession_*', '_hjid', '_hjFirstSeen', '_hjIncludedInPageviewSample', '_hjAbsoluteSessionInProgress'],
+    requiresReload: true,
     onAccept() {
       if (window.hj) return
       window._hjSettings = { hjid: siteId, hjsv: version }
@@ -18,7 +27,8 @@ export function hotjar(siteId: number, { version = 6, id = 'hotjar' } = {}) {
       loadScript(`https://static.hotjar.com/c/hotjar-${siteId}.js?sv=${version}`)
     },
     onRefuse() {
-      deleteCookiesMatching(['_hjSessionUser_', '_hjSession_', '_hjid'])
+      deleteCookiesMatching(['_hj'])
+      clearStorageMatching(['_hj'])
     },
   })
 }

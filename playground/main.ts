@@ -14,6 +14,7 @@ const { manager } = createTaE({
   banner: {
     preset: 'poop',
     labels: frPoop,
+    privacyUrl: '#confidentialite',
     // Exemples de surcharge — décommentez pour tester :
     // labels: { ...frPoop, title: 'Vos cookies, votre choix' },
     // vars: { ...poopTheme, accent: '#e11d48', stripeA: '#e11d48', stripeB: '#f97316' },

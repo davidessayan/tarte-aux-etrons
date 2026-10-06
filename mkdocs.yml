@@ -52,3 +52,7 @@ markdown_extensions:
 
 nav:
   - Accueil: index.md
+  - Services: services.md
+  - Personnalisation: personnalisation.md
+  - Consentement & RGPD: consentement.md
+  - API & avancé: api.md
