@@ -25,9 +25,9 @@ jobs:
       - name: Deploy to server
         env:
           SSH_PRIVATE_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
-          REMOTE_USER: creativeqs
-          REMOTE_HOST: ssh.cluster123.hosting.ovh.net
-          REMOTE_PATH: /home/creativeqs/tarteauxetrons
+          REMOTE_USER: 5u1ins_ssh
+          REMOTE_HOST: 5u1ins.ftp.infomaniak.com
+          REMOTE_DOCS: /home/clients/c6a8788ddf45d365ac79539cdb09580b/sites/tarteauxetrons.creative-bones.com/current/docs
         run: |
           install -m 700 -d ~/.ssh
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
