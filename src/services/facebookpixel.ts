@@ -6,7 +6,8 @@ export function facebookPixel(pixelId: string, id = 'facebook-pixel') {
     name: 'Facebook Pixel',
     category: 'advertising',
     description: 'Mesure les conversions et cible les publicités Facebook/Meta.',
-    cookieNames: ['_fbp', 'fr'],
+    cookieNames: ['_fbp', '_fbc', 'fr'],
+    requiresReload: true,
     onAccept() {
       if (window.fbq) return
       const fbq = Object.assign(
@@ -23,7 +24,8 @@ export function facebookPixel(pixelId: string, id = 'facebook-pixel') {
       loadScript('https://connect.facebook.net/en_US/fbevents.js')
     },
     onRefuse() {
-      deleteCookies(['_fbp', 'fr'])
+      window.fbq?.('consent', 'revoke')
+      deleteCookies(['_fbp', '_fbc', 'fr'])
     },
   })
 }

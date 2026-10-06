@@ -14,16 +14,25 @@ export function loadScript(src: string): void {
 }
 
 /**
- * Supprime des cookies côté client (racine + sous-domaine).
- * Ne peut pas supprimer les cookies HttpOnly.
+ * Expire un cookie sur l'hôte courant et sur chacun de ses domaines parents
+ * (ex. sur www.site.fr : www.site.fr puis site.fr), là où les trackers le posent.
+ */
+function expireCookie(name: string): void {
+  const expired = 'expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/'
+  document.cookie = `${name}=; ${expired}`
+  const labels = location.hostname.split('.')
+  for (let i = 0; i < labels.length - 1; i++) {
+    document.cookie = `${name}=; ${expired}; domain=.${labels.slice(i).join('.')}`
+  }
+}
+
+/**
+ * Supprime des cookies côté client (hôte courant + domaines parents).
+ * Ne peut pas supprimer les cookies HttpOnly ni ceux posés sur le domaine d'un tiers.
  */
 export function deleteCookies(names: string[]): void {
   if (typeof document === 'undefined') return
-  const expired = 'expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/'
-  names.forEach((name) => {
-    document.cookie = `${name}=; ${expired}`
-    document.cookie = `${name}=; ${expired}; domain=.${location.hostname}`
-  })
+  names.forEach(expireCookie)
 }
 
 /**
@@ -32,14 +41,28 @@ export function deleteCookies(names: string[]): void {
  */
 export function deleteCookiesMatching(prefixes: string[]): void {
   if (typeof document === 'undefined') return
-  const expired = 'expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/'
   document.cookie.split(';').forEach((pair) => {
     const name = pair.split('=')[0].trim()
-    if (prefixes.some((prefix) => name.startsWith(prefix))) {
-      document.cookie = `${name}=; ${expired}`
-      document.cookie = `${name}=; ${expired}; domain=.${location.hostname}`
-    }
+    if (prefixes.some((prefix) => name.startsWith(prefix))) expireCookie(name)
   })
+}
+
+/**
+ * Supprime du localStorage et du sessionStorage les clés commençant par l'un des préfixes donnés.
+ * Les traceurs (Hotjar, Crisp…) y stockent aussi des identifiants : même régime que les cookies.
+ */
+export function clearStorageMatching(prefixes: string[]): void {
+  if (typeof window === 'undefined') return
+  for (const storage of [() => window.localStorage, () => window.sessionStorage]) {
+    try {
+      const area = storage()
+      Object.keys(area)
+        .filter((key) => prefixes.some((prefix) => key.startsWith(prefix)))
+        .forEach((key) => area.removeItem(key))
+    } catch {
+      // storage indisponible (navigation privée stricte, iframe sandboxée)
+    }
+  }
 }
 
 /**

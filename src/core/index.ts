@@ -6,6 +6,7 @@ export type {
   ConsentStatus,
   ServiceDefinition,
   ServiceCategory,
+  ConsentSignal,
   TaEConfig,
   ConsentEventMap,
   ServiceConsent,

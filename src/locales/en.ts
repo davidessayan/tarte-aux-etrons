@@ -2,12 +2,15 @@ import type { BannerLabels } from '../core/types'
 
 export const en: BannerLabels = {
   title: 'This site uses cookies',
-  description: 'Some are useful, some less so. Choose what you accept.',
+  description: 'We use cookies and trackers to measure audience and embed third-party content. Choose which ones you allow: you can change your mind at any time.',
   acceptAll: 'Accept all',
   refuseAll: 'Refuse all',
   customize: 'Customize',
   customizeClose: 'Close',
   save: 'Save my choices',
+  privacyPolicy: 'Privacy policy',
+  cookiesLabel: 'Cookies:',
+  reopen: 'Manage cookies',
   categoryLabels: {
     analytics: 'Analytics',
     advertising: 'Advertising',
@@ -25,6 +28,9 @@ export const enPoop: BannerLabels = {
   customize: 'Pick your poop',
   customizeClose: 'Close the lid',
   save: 'Save my choices',
+  privacyPolicy: 'Privacy policy',
+  cookiesLabel: 'Cookies dropped:',
+  reopen: 'Manage my poop',
   categoryLabels: {
     analytics: 'Polite spying',
     advertising: 'Targeted ads',

@@ -2,38 +2,20 @@
 
 > Parce que les cookies, c'est de la merde.
 
-Une lib RGPD/cookie consent moderne, typée TypeScript, sans dépendances, et qui assume totalement son thème.
+Une bannière de consentement RGPD en une ligne. TypeScript, zéro dépendance, Consent Mode v2 inclus, et un thème qui assume.
 
 [![npm](https://img.shields.io/npm/v/tarte-aux-etrons)](https://www.npmjs.com/package/tarte-aux-etrons)
 [![license](https://img.shields.io/npm/l/tarte-aux-etrons)](https://github.com/davidessayan/tarte-aux-etrons/blob/main/LICENSE)
 
 [📖 Documentation](https://tarteauxetrons.creative-bones.com/docs) · [🛝 Playground](https://tarteauxetrons.creative-bones.com)
 
----
-
-## Pourquoi ?
-
-Parce que les cookies, c'est de la merde. Alors autant en faire un truc agréable.
-
-`tarte-aux-etrons` est une lib légère, typée TypeScript, sans dépendances, avec une API pensée pour ne pas vous pourrir la vie.
-
----
-
 ## Installation
 
 ```bash
 npm install tarte-aux-etrons
-# ou
-pnpm add tarte-aux-etrons
-# ou
-yarn add tarte-aux-etrons
 ```
 
----
-
 ## Démarrage rapide
-
-Le plus court chemin vers une bannière RGPD qui tourne :
 
 ```ts
 import { createTaE, ga4 } from 'tarte-aux-etrons'
@@ -43,458 +25,67 @@ createTaE({
 })
 ```
 
-C'est tout. La bannière 💩 s'affiche, le consentement est persisté en localStorage, GA4 se charge si l'utilisateur accepte.
+C'est tout. La bannière s'affiche, le choix est mémorisé, et GA4 ne se charge que si le visiteur accepte.
 
----
+## Sans tortiller du c**
 
-## Concepts clés
+Tout ça marche sans configuration :
 
-| Concept | Rôle |
+- **Rien ne se charge avant le choix** du visiteur.
+- **Refuser est aussi simple qu'accepter** : mêmes boutons, un clic.
+- **Changer d'avis est facile** : un bouton « Gérer mes cookies » reste disponible. Un service retiré est coupé et ses cookies nettoyés.
+- **Consent Mode v2** (GA4, GTM) géré automatiquement.
+- **Le choix expire au bout de 6 mois**, comme le recommande maître CNIL.
+
+## Services
+
+Un appel par service, rien d'autre à configurer :
+
+| Service | Appel |
 |---|---|
-| **`ConsentManager`** | Cerveau. Gère l'état, le storage, les événements. |
-| **`Banner`** | UI. Affiche la bannière et le panneau de personnalisation. |
-| **`createTaE()`** | Factory. Câble les deux dans le bon ordre en une ligne. |
-| **Services** | Définissent quoi charger/nettoyer selon le consentement. |
+| Google Analytics 4 | `ga4('G-XXXXXXXXXX')` |
+| Google Tag Manager | `gtm('GTM-XXXXXXX')` · `gtm('GTM-XXXXXXX', { ads: true })` |
+| Hotjar | `hotjar(1234567)` |
+| Matomo | `matomo('https://analytics.monsite.fr', 1)` |
+| Microsoft Clarity | `microsoftClarity('abcdefghij')` |
+| Facebook Pixel | `facebookPixel('1234567890123456')` |
+| LinkedIn Insight Tag | `linkedinInsight('1234567')` |
+| Google reCAPTCHA v3 | `recaptchaV3('6LeXXXX…')` |
+| Crisp | `crisp('xxxxxxxx-xxxx-…')` |
+| YouTube | `youtube()` |
+| Google Maps | `googleMaps()` |
+| Chicken Player | `chickenplayer()` |
 
----
+YouTube et Google Maps demandent `data-src` au lieu de `src` sur vos iframes. Il manque un service ? [Créez le vôtre](https://tarteauxetrons.creative-bones.com/docs/latest/api/#creer-un-service-personnalise) en quelques lignes.
 
-## Services disponibles
-
-### Google Analytics 4
-
-```ts
-import { ga4 } from 'tarte-aux-etrons'
-
-ga4('G-XXXXXXXXXX')
-
-// Plusieurs propriétés GA4 sur le même site
-ga4('G-XXXXXXXXXX')              // id: 'ga4' (défaut)
-ga4('G-YYYYYYYYYY', 'ga4-blog') // id custom pour éviter les conflits
-```
-
-### Google Tag Manager
+## TAE pour un client sérieux, c'est faisable
 
 ```ts
-import { gtm } from 'tarte-aux-etrons'
+import { createTaE, ga4, youtube, en } from 'tarte-aux-etrons'
 
-gtm('GTM-XXXXXXX')
-gtm('GTM-XXXXXXX', 'gtm-shop') // id custom
-```
-
-### YouTube
-
-```ts
-import { youtube } from 'tarte-aux-etrons'
-
-youtube()
-```
-
-Utilisez `data-src` au lieu de `src` sur vos iframes YouTube — la lib active le chargement une fois le consentement donné :
-
-```html
-<iframe
-  data-src="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ"
-  width="560" height="315"
-  allowfullscreen
-></iframe>
-```
-
-Fonctionne aussi avec `youtube.com` dans l'URL. Sur refus, le `src` est vidé pour stopper le chargement.
-
-### Hotjar
-
-```ts
-import { hotjar } from 'tarte-aux-etrons'
-
-hotjar(1234567)
-hotjar(1234567, { version: 6, id: 'hotjar-custom' })
-```
-
-### Facebook Pixel
-
-```ts
-import { facebookPixel } from 'tarte-aux-etrons'
-
-facebookPixel('1234567890123456')
-facebookPixel('1234567890123456', 'fb-pixel') // id custom
-```
-
-### LinkedIn Insight Tag
-
-```ts
-import { linkedinInsight } from 'tarte-aux-etrons'
-
-linkedinInsight('1234567')
-linkedinInsight('1234567', 'linkedin') // id custom
-```
-
-### Google Maps
-
-```ts
-import { googleMaps } from 'tarte-aux-etrons'
-
-googleMaps()
-```
-
-Utilisez `data-src` au lieu de `src` sur vos iframes Google Maps :
-
-```html
-<iframe
-  data-src="https://www.google.com/maps/embed?pb=..."
-  width="600" height="450"
-  allowfullscreen loading="lazy"
-></iframe>
-```
-
-### Matomo
-
-```ts
-import { matomo } from 'tarte-aux-etrons'
-
-matomo('https://analytics.monsite.fr', 1)
-matomo('https://analytics.monsite.fr', 1, 'matomo-custom') // id custom
-```
-
-Le trailing slash dans l'URL est normalisé automatiquement.
-
-### Google reCAPTCHA v3
-
-```ts
-import { recaptchaV3 } from 'tarte-aux-etrons'
-
-recaptchaV3('6LeXXXXXXXXXXXXXXXXXXXXXXXX')
-recaptchaV3('6LeXXXXXXXXXXXXXXXXXXXXXXXX', 'recaptcha-contact') // id custom
-```
-
-Le script n'est chargé qu'après consentement. Une fois chargé, `grecaptcha.execute()` reste disponible pour vos formulaires. Sur refus, le cookie `_GRECAPTCHA` est supprimé — le script déjà chargé ne peut pas être déchargé, mais il ne se rechargera pas lors des visites suivantes.
-
-### Microsoft Clarity
-
-```ts
-import { microsoftClarity } from 'tarte-aux-etrons'
-
-microsoftClarity('abcdefghij')
-microsoftClarity('abcdefghij', 'clarity-custom') // id custom
-```
-
-Clarity dispose d'une Consent API native : `clarity('consent')` est appelé automatiquement sur acceptation. Sur refus, les cookies sont supprimés et Clarity bascule en mode cookieless.
-
-### Crisp
-
-```ts
-import { crisp } from 'tarte-aux-etrons'
-
-crisp('xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx')
-crisp('xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx', 'crisp-support') // id custom
-```
-
-Sur refus, la session est réinitialisée et le chatbox masqué. Crisp utilise principalement le localStorage — aucun cookie first-party propre n'est déposé.
-
-### Chicken Player
-
-Intégration native avec [chicken-player](https://www.npmjs.com/package/chicken-player). Gère le consentement pour YouTube, Vimeo et Dailymotion embarqués via le player.
-
-```ts
-import { chickenplayer } from 'tarte-aux-etrons'
-
-chickenplayer()
-```
-
-Côté player, activez la gestion du consentement et listez les plateformes concernées :
-
-```ts
-import ChickenPlayer from 'chicken-player'
-
-new ChickenPlayer({
-  cookies: {
-    active: true,
-    types: ['youtube', 'vimeo', 'dailymotion'],
-  },
-})
-```
-
-Sur acceptation, tarte-aux-etrons dispatche `chickenPlayer.cookies.consent` — le player déverrouille automatiquement les vidéos. Sur refus, `chickenPlayer.cookies.reject` — le player réaffiche le message de consentement.
-
----
-
-## Créer un service personnalisé
-
-```ts
-import { defineService } from 'tarte-aux-etrons'
-
-const myPixel = defineService({
-  id: 'my-pixel',
-  name: 'Mon Pixel',
-  category: 'advertising', // 'analytics' | 'advertising' | 'social' | 'functional' | 'other'
-  description: 'Suit les conversions.',
-  cookieNames: ['_mypixel'],
-  onAccept() {
-    // Charger le script, initialiser le tracker, etc.
-  },
-  onRefuse() {
-    // Nettoyer les cookies, désactiver le tracker, etc.
-  },
-})
-```
-
-**Utilitaires disponibles** pour écrire vos services :
-
-```ts
-import { loadScript, deleteCookies, deleteCookiesMatching } from 'tarte-aux-etrons'
-
-// Charge un script (idempotent — pas de double chargement)
-loadScript('https://example.com/tracker.js')
-
-// Supprime des cookies par nom exact (racine + sous-domaine)
-deleteCookies(['_tracker', '_tracker_session'])
-
-// Supprime tous les cookies dont le nom commence par l'un des préfixes
-// Utile pour les cookies à suffixe dynamique (_pk_id.1.xxxx, _hjSession_abc...)
-deleteCookiesMatching(['_tracker_', '_tracker_sess'])
-```
-
----
-
-## Thème et personnalisation
-
-### Presets
-
-```ts
 createTaE({
-  services: [...],
+  services: [ga4('G-XXXXXXXXXX'), youtube()],
   banner: {
-    preset: 'poop',    // 💩 brun ambré — défaut
-    preset: 'serious', // bleu sobre
-    preset: 'none',    // aucun style — apportez le vôtre
+    preset: 'serious',               // 💩 par défaut, ou le thème bleu sobre
+    labels: en,                      // fr, frPoop, en, enPoop… ou les vôtres
+    privacyUrl: '/privacy',          // lien vers votre politique de confidentialité
   },
 })
 ```
 
-### Surcharge de tokens CSS
+## Aller plus loin
 
-```ts
-import { poopTheme } from 'tarte-aux-etrons'
+- [Services en détail](https://tarteauxetrons.creative-bones.com/docs/latest/services/) : options, prérequis et particularités de chaque service
+- [Personnalisation](https://tarteauxetrons.creative-bones.com/docs/latest/personnalisation/) : thèmes, couleurs, textes et langues
+- [Consentement & RGPD](https://tarteauxetrons.creative-bones.com/docs/latest/consentement/) : Consent Mode, durée de validité, retrait du consentement
+- [API & avancé](https://tarteauxetrons.creative-bones.com/docs/latest/api/) : événements, état du consentement, service personnalisé, sans bannière
 
-createTaE({
-  services: [...],
-  banner: {
-    vars: {
-      ...poopTheme,          // base poop
-      accent: '#e11d48',     // juste la couleur principale
-      stripeA: '#e11d48',
-      stripeB: '#f97316',
-    },
-  },
-})
-```
-
-**Tokens disponibles :**
-
-| Token | Variable CSS | Description |
-|---|---|---|
-| `accent` | `--tae-accent` | Couleur principale (boutons, toggles) |
-| `accentHover` | `--tae-accent-hover` | Hover sur la couleur principale |
-| `accentLight` | `--tae-accent-light` | Fond de hover sur les services |
-| `accentMid` | `--tae-accent-mid` | Couleur des catégories |
-| `bg` | `--tae-bg` | Fond de la bannière |
-| `border` | `--tae-border` | Bordures |
-| `stripeA` | `--tae-stripe-a` | Début du dégradé de la bande |
-| `stripeB` | `--tae-stripe-b` | Fin du dégradé de la bande |
-| `text` | `--tae-text` | Texte principal |
-| `textMuted` | `--tae-text-muted` | Texte secondaire |
-| `textSubtle` | `--tae-text-subtle` | Texte tertiaire (descriptions) |
-| `serviceBg` | `--tae-service-bg` | Fond des cards de service |
-| `serviceBorder` | `--tae-service-border` | Bordure des cards de service |
-| `radius` | `--tae-radius` | Border-radius de la bannière |
-
-**Surcharge CSS directe** (contrôle total) :
-
-```css
-.tae-banner {
-  --tae-accent: #e11d48;
-  --tae-bg: #fff1f2;
-  --tae-border: #fecdd3;
-}
-```
-
----
-
-## Localisation
-
-Des locales prêtes à l'emploi sont fournies. Importez, étendez, ou remplacez.
-
-```ts
-import { createTaE, ga4, frPoop, en } from 'tarte-aux-etrons'
-
-// Locale 💩 française (défaut du preset 'poop')
-createTaE({ services: [ga4('G-XXX')], banner: { labels: frPoop } })
-
-// Locale anglaise sobre
-createTaE({ services: [ga4('G-XXX')], banner: { labels: en } })
-
-// Override partiel
-createTaE({
-  services: [ga4('G-XXX')],
-  banner: {
-    labels: { ...frPoop, title: 'Vos cookies, votre choix' },
-  },
-})
-```
-
-**Locales disponibles :**
-
-| Export | Langue | Style |
-|---|---|---|
-| `fr` | Français | Sobre |
-| `frPoop` | Français | 💩 |
-| `en` | Anglais | Sobre |
-| `enPoop` | Anglais | 💩 |
-
-**Créer sa propre locale :**
-
-```ts
-import type { BannerLabels } from 'tarte-aux-etrons'
-
-const de: BannerLabels = {
-  title: 'Diese Website verwendet Cookies',
-  description: 'Wählen Sie aus, was Sie akzeptieren.',
-  acceptAll: 'Alle akzeptieren',
-  refuseAll: 'Alle ablehnen',
-  customize: 'Anpassen',
-  save: 'Meine Auswahl speichern',
-  categoryLabels: {
-    analytics: 'Analyse',
-    advertising: 'Werbung',
-    social: 'Soziale Medien',
-    functional: 'Funktional',
-    other: 'Sonstiges',
-  },
-}
-```
-
----
-
-## Événements
-
-### Écouter les changements
-
-```ts
-const { manager } = createTaE({ services: [...] })
-
-// Changement individuel (clic sur un toggle dans le panneau)
-manager.on('consent:change', ({ serviceId, status, state }) => {
-  console.log(`${serviceId} → ${status}`) // 'accepted' | 'refused'
-})
-
-// Changement en masse (boutons "Tout accepter" / "Tout refuser")
-manager.on('consent:bulk', ({ action, state }) => {
-  console.log(action) // 'swallow-all' | 'flush-all'
-})
-
-// Prêt (appelé une fois à l'init, avec l'état restauré du storage)
-manager.on('ready', (state) => {
-  console.log(state)
-})
-```
-
-### Désabonnement
-
-`manager.on()` retourne une fonction de désabonnement :
-
-```ts
-const unsubscribe = manager.on('consent:change', handler)
-// Plus tard :
-unsubscribe()
-```
-
----
-
-## Vérifier le consentement à la demande
-
-```ts
-manager.isDigested('ga4')  // boolean — consentement donné
-manager.isFlushed('ga4')   // boolean — refusé
-manager.isFloating('ga4')  // boolean — pas encore décidé
-
-manager.getServiceStatus('ga4') // 'accepted' | 'refused' | 'pending'
-manager.getState()              // ConsentState complet
-```
-
----
-
-## Actions programmatiques
-
-```ts
-manager.swallowAll() // Accepte tous les services
-manager.flushAll()   // Refuse tous les services
-manager.swallow('ga4') // Accepte un service précis
-manager.flush('ga4')   // Refuse un service précis
-manager.plunge()       // Réinitialise tout + réaffiche la bannière 🪠
-```
-
----
-
-## Utilisation avancée — sans bannière
-
-Vous pouvez utiliser le `ConsentManager` seul et construire votre propre UI :
-
-```ts
-import { ConsentManager, ga4 } from 'tarte-aux-etrons'
-
-const manager = new ConsentManager({
-  services: [ga4('G-XXXXXXXXXX')],
-  consentVersion: 1,
-  onReady(state) { /* état restauré */ },
-  onConsentChange(serviceId, status) { /* changement individuel */ },
-  onBulkChange(action, state) { /* swallowAll / flushAll */ },
-})
-
-manager.init() // À appeler après avoir monté votre UI
-```
-
----
-
-## API complète — `createTaE(options)`
-
-```ts
-createTaE({
-  // Obligatoire
-  services: ServiceDefinition[],
-
-  // Optionnel — ConsentManager
-  storageKey?: string,       // clé localStorage, défaut: 'tae_consent'
-  consentVersion?: number,   // incrémenter pour forcer un re-consentement
-  onReady?: (state) => void,
-  onConsentChange?: (serviceId, status) => void,
-  onBulkChange?: (action, state) => void, // action: 'swallow-all' | 'flush-all'
-
-  // Optionnel — Bannière
-  banner?: {
-    target?: HTMLElement,              // où monter la bannière, défaut: document.body
-    preset?: 'poop' | 'serious' | 'none',
-    vars?: ThemeVars,
-    labels?: Partial<BannerLabels>,
-  },
-})
-```
-
----
-
-## Compatibilité
-
-- **Navigateurs** : tous les navigateurs modernes (ES2020+)
-- **Frameworks** : framework-agnostic — fonctionne avec React, Vue, Svelte, Next.js, Nuxt, vanilla JS...
-- **SSR** : `ConsentManager.init()` ne s'exécute pas côté serveur (`typeof window === 'undefined'` guard)
-- **Bundle** : ESM + CJS, types `.d.ts` inclus
-
----
+Navigateurs modernes (ES2020+), compatible avec tous les frameworks et le SSR. ESM + CJS, types inclus.
 
 ## Shitmap
 
-- Ajout de `isPerfect()` à l'API quand tous les services ont été acceptés (ou refusés)
-- Ajout progressif de services d'étrons complémentaires (Google Fonts, Cloudflare Turnstile, TrustPilot, Brevo, Intercom...)
-
----
+- `isPerfect()` : savoir si tous les services ont été acceptés (ou refusés)
+- Plus de services d'étrons : Google Fonts, Cloudflare Turnstile, TrustPilot, Brevo, Intercom…
 
 ## Licence
 

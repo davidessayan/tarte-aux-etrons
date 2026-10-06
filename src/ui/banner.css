@@ -1,5 +1,6 @@
 /* ─── Tokens (thème 💩 par défaut) ────────────────────────────────────────── */
-.tae-banner {
+.tae-banner,
+.tae-reopen {
   --tae-accent: #92400e;
   --tae-accent-hover: #78350f;
   --tae-accent-light: #fef3c7;
@@ -17,7 +18,8 @@
 }
 
 /* ─── Thème "serious" (bleu sobre) ────────────────────────────────────────── */
-.tae-banner[data-theme="serious"] {
+.tae-banner[data-theme="serious"],
+.tae-reopen[data-theme="serious"] {
   --tae-accent: #2563eb;
   --tae-accent-hover: #1d4ed8;
   --tae-accent-light: #eff6ff;
@@ -149,6 +151,16 @@
   font-size: .875rem;
 }
 
+.tae-link {
+  color: var(--tae-accent);
+  font-weight: 600;
+  text-underline-offset: .15em;
+}
+
+.tae-link:hover {
+  color: var(--tae-accent-hover);
+}
+
 /* ─── Actions ─────────────────────────────────────────────────────────────── */
 .tae-actions {
   display: flex;
@@ -270,6 +282,12 @@
   color: var(--tae-text-subtle);
 }
 
+.tae-service-cookies {
+  font-size: .72rem;
+  color: var(--tae-text-subtle);
+  overflow-wrap: anywhere;
+}
+
 /* ─── Toggle ──────────────────────────────────────────────────────────────── */
 .tae-toggle {
   flex-shrink: 0;
@@ -317,6 +335,39 @@
   justify-content: center;
 }
 
+/* ─── Bouton de réouverture ───────────────────────────────────────────────── */
+.tae-reopen {
+  position: fixed;
+  bottom: 1rem;
+  left: 1rem;
+  z-index: 99998;
+  padding: .4rem .85rem;
+  border-radius: 999px;
+  border: 1.5px solid var(--tae-border);
+  background: var(--tae-bg);
+  color: var(--tae-text-muted);
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: .75rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, .15);
+  transition: color .15s, border-color .15s;
+}
+
+.tae-reopen:hover {
+  color: var(--tae-text);
+  border-color: var(--tae-accent);
+}
+
+.tae-reopen:focus-visible {
+  outline: 2px solid var(--tae-accent);
+  outline-offset: 2px;
+}
+
+.tae-reopen[hidden] {
+  display: none;
+}
+
 /* ─── Mobile ──────────────────────────────────────────────────────────────── */
 @media (max-width: 540px) {
   .tae-banner {
@@ -358,19 +409,6 @@
     width: 100%;
     justify-content: center;
     padding: .6rem 1rem;
-  }
-
-  /* Bouton principal en premier sur mobile */
-  .tae-btn-accept {
-    order: -1;
-  }
-
-  .tae-btn-customize {
-    order: 0;
-  }
-
-  .tae-btn-refuse {
-    order: 1;
   }
 
   .tae-services {

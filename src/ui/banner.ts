@@ -11,6 +11,10 @@ export interface BannerOptions {
   preset?: 'poop' | 'serious' | 'none'
   vars?: ThemeVars
   labels?: Partial<BannerLabels>
+  /** URL de la politique de confidentialité : affiche un lien dans la bannière. */
+  privacyUrl?: string
+  /** Bouton flottant pour rouvrir le panneau une fois le choix fait (défaut : true). */
+  reopenButton?: boolean
 }
 
 function escape(str: string): string {
@@ -44,7 +48,10 @@ export class Banner {
   private preset: BannerOptions['preset']
   private labels: BannerLabels
   private vars: ThemeVars
+  private privacyUrl: string | undefined
+  private reopenButton: boolean
   private el: HTMLElement | null = null
+  private reopenEl: HTMLElement | null = null
   private panel: HTMLElement | null = null
   private customizeBtn: HTMLElement | null = null
   private unsubscribers: Array<() => void> = []
@@ -54,6 +61,8 @@ export class Banner {
     this.target = options.target ?? document.body
     this.preset = options.preset ?? 'poop'
     this.vars = options.vars ?? {}
+    this.privacyUrl = options.privacyUrl
+    this.reopenButton = options.reopenButton ?? true
 
     const baseLabels = this.preset === 'serious' ? fr : frPoop
     this.labels = { ...baseLabels, ...options.labels }
@@ -63,6 +72,11 @@ export class Banner {
     this.el = this.buildEl()
     this.applyVars()
     this.target.appendChild(this.el)
+
+    if (this.reopenButton) {
+      this.reopenEl = this.buildReopen()
+      this.target.appendChild(this.reopenEl)
+    }
 
     const showUnsub = this.manager.on('banner:show', () => this.show())
     const hideUnsub = this.manager.on('banner:hide', () => this.hide())
@@ -77,17 +91,23 @@ export class Banner {
 
   unmount(): void {
     this.el?.remove()
+    this.reopenEl?.remove()
     this.el = null
+    this.reopenEl = null
     this.panel = null
     this.unsubscribers.forEach((fn) => fn())
     this.unsubscribers = []
   }
 
-  show(): void {
+  show({ customize = false }: { customize?: boolean } = {}): void {
     if (!this.el) return
+    // Les toggles reflètent toujours l'état réel du consentement, pas celui du montage
+    this.syncToggles()
+    this.reopenEl?.setAttribute('hidden', '')
     this.el.removeAttribute('hidden')
     this.el.classList.remove('tae-banner--out')
     this.el.classList.add('tae-banner--in')
+    if (customize) this.setPanelOpen(true)
   }
 
   hide(): void {
@@ -98,6 +118,7 @@ export class Banner {
       this.el?.setAttribute('hidden', '')
       this.el?.classList.remove('tae-banner--out')
       this.el?.removeEventListener('animationend', onEnd)
+      this.reopenEl?.removeAttribute('hidden')
     }
     this.el.addEventListener('animationend', onEnd)
   }
@@ -126,13 +147,30 @@ export class Banner {
     return root
   }
 
+  private buildReopen(): HTMLElement {
+    const btn = document.createElement('button')
+    btn.type = 'button'
+    btn.className = 'tae-reopen'
+    if (this.preset === 'serious') btn.dataset.theme = 'serious'
+    btn.innerHTML = `${this.preset === 'poop' ? '<span aria-hidden="true">💩</span> ' : ''}${escape(this.labels.reopen)}`
+    btn.hidden = this.manager.needsBanner()
+    btn.addEventListener('click', () => this.show({ customize: true }))
+    return btn
+  }
+
   private renderHTML(): string {
     const isPoop = this.preset === 'poop'
     const services = this.manager.getServices()
+    const privacyLink = this.privacyUrl
+      ? ` <a class="tae-link" href="${escape(this.privacyUrl)}">${escape(this.labels.privacyPolicy)}</a>`
+      : ''
 
     const serviceRows = services.map((s) => {
       const accepted = this.manager.isDigested(s.id)
       const categoryLabel = this.labels.categoryLabels[s.category]
+      const cookies = s.cookieNames?.length
+        ? `<span class="tae-service-cookies">${escape(this.labels.cookiesLabel)} ${escape(s.cookieNames.join(', '))}</span>`
+        : ''
 
       return `
         <div class="tae-service">
@@ -141,13 +179,13 @@ export class Banner {
               <strong class="tae-service-name">${escape(s.name)}</strong>
               <span class="tae-service-category">${escape(categoryLabel)}</span>
               <span class="tae-service-desc">${escape(s.description)}</span>
+              ${cookies}
             </span>
             <input
               type="checkbox"
               class="tae-toggle"
               data-service-id="${escape(s.id)}"
               role="switch"
-              aria-checked="${accepted}"
               ${accepted ? 'checked' : ''}
             />
           </label>
@@ -159,9 +197,9 @@ export class Banner {
       ${isPoop ? '<span class="tae-icon" aria-hidden="true">💩</span>' : ''}
       <div class="tae-banner-inner">
         <p class="tae-title">${escape(this.labels.title)}</p>
-        <p class="tae-desc">${escape(this.labels.description)}</p>
+        <p class="tae-desc">${escape(this.labels.description)}${privacyLink}</p>
         <div class="tae-actions">
-          <button class="tae-btn tae-btn-refuse">${escape(this.labels.refuseAll)}</button>
+          <button class="tae-btn tae-btn-refuse tae-btn-primary">${escape(this.labels.refuseAll)}</button>
           <button class="tae-btn tae-btn-customize">${escape(this.labels.customize)}</button>
           <button class="tae-btn tae-btn-accept tae-btn-primary">${escape(this.labels.acceptAll)}</button>
         </div>
@@ -179,17 +217,30 @@ export class Banner {
   private applyVars(): void {
     if (!this.el) return
     for (const [key, value] of Object.entries(this.vars) as [keyof ThemeVars, string][]) {
-      if (value) this.el.style.setProperty(VAR_MAP[key], value)
+      if (!value) continue
+      this.el.style.setProperty(VAR_MAP[key], value)
+      this.reopenEl?.style.setProperty(VAR_MAP[key], value)
     }
   }
 
   private togglePanel(): void {
-    const isOpen = this.panel?.classList.toggle('tae-panel--open') ?? false
+    this.setPanelOpen(!this.panel?.classList.contains('tae-panel--open'))
+  }
+
+  private setPanelOpen(open: boolean): void {
+    this.panel?.classList.toggle('tae-panel--open', open)
     if (this.customizeBtn) {
-      this.customizeBtn.textContent = isOpen
+      this.customizeBtn.textContent = open
         ? this.labels.customizeClose
         : this.labels.customize
     }
+  }
+
+  private syncToggles(): void {
+    this.panel?.querySelectorAll<HTMLInputElement>('.tae-toggle').forEach((input) => {
+      const { serviceId } = input.dataset
+      if (serviceId) input.checked = this.manager.isDigested(serviceId)
+    })
   }
 
   private saveFromPanel(): void {

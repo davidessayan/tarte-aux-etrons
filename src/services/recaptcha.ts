@@ -7,6 +7,7 @@ export function recaptchaV3(siteKey: string, id = 'recaptcha') {
     category: 'functional',
     description: 'Protection anti-spam et anti-bot sur les formulaires.',
     cookieNames: ['_GRECAPTCHA'],
+    requiresReload: true,
     onAccept() {
       if (window.grecaptcha) return
       loadScript(`https://www.google.com/recaptcha/api.js?render=${siteKey}`)

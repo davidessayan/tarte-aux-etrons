@@ -7,6 +7,7 @@ export function linkedinInsight(partnerId: string, id = 'linkedin-insight') {
     category: 'advertising',
     description: 'Mesure les conversions et retargeting publicitaire LinkedIn.',
     cookieNames: ['li_sugr', 'UserMatchHistory', 'bcookie', 'lidc', 'li_gc'],
+    requiresReload: true,
     onAccept() {
       if (window._linkedin_partner_id) return
       window._linkedin_partner_id = partnerId

@@ -8,6 +8,7 @@ export function matomo(siteUrl: string, siteId: number, id = 'matomo') {
     category: 'analytics',
     description: "Mesure d'audience auto-hébergée, respectueuse de la vie privée.",
     cookieNames: ['_pk_id.*', '_pk_ses.*', '_pk_ref.*'],
+    requiresReload: true,
     onAccept() {
       if (window._paq) return
       window._paq = []
